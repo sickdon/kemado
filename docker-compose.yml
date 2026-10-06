@@ -4,7 +4,17 @@ services:
     container_name: kemado-prototipi
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8081:80"   # solo localhost: lo raggiunge cloudflared, non internet
+      - "127.0.0.1:8081:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./sites:/usr/share/nginx/html:ro
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: kemado-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - web
